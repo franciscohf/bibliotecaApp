@@ -1,0 +1,17 @@
+[
+  {
+    "nombre": "Ciencia Ficción",
+    "descripcion": "Obras literarias basadas en futuros especulativos, avances científicos y viajes espaciales.",
+    "estado": true
+  },
+  {
+    "nombre": "Historia Universal",
+    "descripcion": "Libros y documentos que relatan los grandes acontecimientos de las civilizaciones humanas.",
+    "estado": true
+  },
+  {
+    "nombre": "Literatura Clásica",
+    "descripcion": "Novelas y textos canónicos de la literatura universal que han perdurado a través de los siglos.",
+    "estado": true
+  }
+]

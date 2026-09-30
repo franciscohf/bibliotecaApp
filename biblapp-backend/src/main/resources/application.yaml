@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: biblapp-backend
+  jpa:
+    database: postgresql
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+  datasource:
+    url: jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:5432/postgres
+    username: postgres.nhhpaglftuqsopmbgoxq
+    password: G5Mz91wUsOfHBxc8
+    driver-class-name: org.postgresql.Driver
+app:
+  supabase:
+    url: ${SUPABASE_URL:https}
+    anon-key: ${SUPABASE_ANON_KEY}
+    service-role-key: ${SUPABASE_SERVICE_ROLE_KEY}
+    bucket: ${SUPABASE_BUCKET}
+    max-photo-size: ${SUPABASE_MAX_PHOTO_SIZE:2097152}
+supabase:
+  url: ${SUPABASE_URL:https}
+  key: ${SUPABASE_SERVICE_ROLE_KEY}
+  bucket: ${SUPABASE_BUCKET:photos}
+  max-photo-size: ${SUPABASE_MAX_PHOTO_SIZE:2097152}

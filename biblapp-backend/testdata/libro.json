@@ -1,0 +1,41 @@
+[
+  {
+    "titulo": "Crónicas del Mañana Galáctico",
+    "autor": "Esteban Alvarado Valenzuela",
+    "isbn": "978-958-00-1122-8",
+    "disponible": true,
+    "editorial": "Editorial Aurora Andina",
+    "anioPublicacion": 2021,
+    "cantidadEjemplares": 5,
+    "photoUrl": "https://img.biblioteca-ficticia.org/portadas/cronicas-manana.jpg",
+    "categoria": {
+      "id": 1
+    }
+  },
+  {
+    "titulo": "Rutas y Sombras del Imperio Antiguo",
+    "autor": "Lucía Morales Quintanilla",
+    "isbn": "978-958-00-3344-5",
+    "disponible": true,
+    "editorial": "Ediciones Memoria Histórica",
+    "anioPublicacion": 2018,
+    "cantidadEjemplares": 3,
+    "photoUrl": "https://img.biblioteca-ficticia.org/portadas/rutas-sombras.jpg",
+    "categoria": {
+      "id": 2
+    }
+  },
+  {
+    "titulo": "Cuentos de la Noche Serena",
+    "autor": "Gabriel Fernando Solano",
+    "isbn": "978-958-00-5566-9",
+    "disponible": true,
+    "editorial": "Letras Clásicas del Sur",
+    "anioPublicacion": 2015,
+    "cantidadEjemplares": 4,
+    "photoUrl": "https://img.biblioteca-ficticia.org/portadas/cuentos-serena.jpg",
+    "categoria": {
+      "id": 3
+    }
+  }
+]

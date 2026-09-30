@@ -1,0 +1,26 @@
+[
+  {
+    "nombres": "Mateo Andrés",
+    "apellidos": "Rojas Carvajal",
+    "cedula": "CC-90812345",
+    "email": "mateo.rojas.ejemplo@biblioteca-demo.org",
+    "telefono": "+57-300-555-0142",
+    "estado": true
+  },
+  {
+    "nombres": "Valeria Sofía",
+    "apellidos": "Mendoza Paredes",
+    "cedula": "CC-90812346",
+    "email": "valeria.mendoza.ejemplo@biblioteca-demo.org",
+    "telefono": "+57-300-555-0178",
+    "estado": true
+  },
+  {
+    "nombres": "Ignacio Javier",
+    "apellidos": "Santillán Cruz",
+    "cedula": "CC-90812347",
+    "email": "ignacio.santillan.ejemplo@biblioteca-demo.org",
+    "telefono": "+57-300-555-0199",
+    "estado": true
+  }
+]
