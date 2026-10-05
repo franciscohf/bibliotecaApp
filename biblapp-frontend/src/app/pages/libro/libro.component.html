@@ -1,0 +1,156 @@
+<router-outlet></router-outlet>
+
+@if (!hasChildActive()) {
+<div class="libro-container">
+  <mat-card class="content-card">
+    <!-- Header / Toolbar -->
+    <div class="table-header">
+      <div class="header-info">
+        <div class="title-with-icon">
+          <mat-icon color="primary">menu_book</mat-icon>
+          <h2>Libros</h2>
+        </div>
+        <p class="subtitle">Administración del catálogo bibliográfico y fotos de portada</p>
+      </div>
+
+      <div class="header-actions">
+        <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+          <mat-label>Buscar libros</mat-label>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Filtrar por título, autor o ISBN..." #input />
+          <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" routerLink="/pages/libro/new" class="add-button">
+          <mat-icon>add</mat-icon>
+          <span>Nuevo Libro</span>
+        </button>
+      </div>
+    </div>
+
+    @if ($loading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <!-- Table Container -->
+    <div class="table-responsive">
+      <table mat-table [dataSource]="dataSource" matSort class="modern-table">
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="th-id">ID</th>
+          <td mat-cell *matCellDef="let row" class="td-id">#{{ row.id }}</td>
+        </ng-container>
+
+        <!-- Portada / Photo Column -->
+        <ng-container matColumnDef="photo">
+          <th mat-header-cell *matHeaderCellDef class="th-photo">Portada</th>
+          <td mat-cell *matCellDef="let row" class="td-photo">
+            <div class="photo-thumbnail-wrapper">
+              <img
+                [src]="getPhotoUrl(row.photoUrl)"
+                [alt]="row.titulo"
+                class="book-thumbnail"
+                (error)="onImageError($event)"
+              />
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Titulo Column -->
+        <ng-container matColumnDef="titulo">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Título</th>
+          <td mat-cell *matCellDef="let row" class="td-titulo">
+            <div class="book-title-cell">
+              <strong>{{ row.titulo }}</strong>
+              @if (row.editorial) {
+                <span class="editorial-sub">{{ row.editorial }}</span>
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Autor Column -->
+        <ng-container matColumnDef="autor">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Autor</th>
+          <td mat-cell *matCellDef="let row" class="td-autor">{{ row.autor }}</td>
+        </ng-container>
+
+        <!-- ISBN Column -->
+        <ng-container matColumnDef="isbn">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>ISBN</th>
+          <td mat-cell *matCellDef="let row" class="td-isbn"><code>{{ row.isbn }}</code></td>
+        </ng-container>
+
+        <!-- Categoria Column -->
+        <ng-container matColumnDef="categoria">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Categoría</th>
+          <td mat-cell *matCellDef="let row" class="td-categoria">
+            <span class="category-badge">{{ row.categoria?.nombre || 'Sin categoría' }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Cantidad Column -->
+        <ng-container matColumnDef="cantidad">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="th-cantidad">Ejemplares</th>
+          <td mat-cell *matCellDef="let row" class="td-cantidad">{{ row.cantidadEjemplares }}</td>
+        </ng-container>
+
+        <!-- Disponible Column -->
+        <ng-container matColumnDef="disponible">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="th-disponible">Disponibilidad</th>
+          <td mat-cell *matCellDef="let row" class="td-disponible">
+            @if (row.disponible === true) {
+              <mat-chip class="chip-status chip-active" highlighted>Disponible</mat-chip>
+            } @else {
+              <mat-chip class="chip-status chip-inactive">Agotado</mat-chip>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="th-actions">Acciones</th>
+          <td mat-cell *matCellDef="let row" class="td-actions">
+            <button
+              mat-icon-button
+              color="primary"
+              [routerLink]="['edit', row.id]"
+              matTooltip="Editar libro"
+              aria-label="Editar">
+              <mat-icon>edit</mat-icon>
+            </button>
+
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="delete(row.id)"
+              matTooltip="Eliminar libro"
+              aria-label="Eliminar">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="hover-row"></tr>
+
+        <!-- No data row -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell no-data-cell" [attr.colspan]="displayedColumns.length">
+            <div class="no-data-content">
+              <mat-icon>menu_book</mat-icon>
+              <span>No se encontraron libros que coincidan con "{{ input.value }}"</span>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Paginator -->
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 25, 50]"
+      aria-label="Seleccionar página de libros"
+      showFirstLastButtons>
+    </mat-paginator>
+  </mat-card>
+</div>
+}

@@ -1,0 +1,74 @@
+<div class="edit-wrapper">
+  <mat-card class="edit-card">
+    <mat-card-header>
+      <div mat-card-avatar class="header-avatar">
+        <mat-icon>{{ $isEdit() ? 'edit' : 'add_circle' }}</mat-icon>
+      </div>
+      <mat-card-title>
+        {{ $isEdit() ? 'Editar Categoría #' + $id() : 'Nueva Categoría' }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ $isEdit() ? 'Actualiza los datos de la categoría' : 'Completa la información para registrar una nueva categoría' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    @if ($isLoading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <mat-card-content>
+      <form [formRoot]="categoriaForm.$form" (submit)="operate()" class="form-container">
+        <div [hidden]="true">
+          <mat-form-field appearance="outline">
+            <mat-label>ID</mat-label>
+            <input matInput placeholder="ID" [formField]="categoriaForm.$form.id" />
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input matInput placeholder="Ej. Novela Histórica" [formField]="categoriaForm.$form.nombre" />
+          <mat-icon matPrefix>label</mat-icon>
+          @if (categoriaForm.$form.nombre().errors().some(error => error.kind === 'required') && categoriaForm.$form.nombre().touched()) {
+            <mat-error>El nombre es obligatorio</mat-error>
+          }
+          @if (categoriaForm.$form.nombre().errors().some(error => error.kind === 'minLength') && categoriaForm.$form.nombre().touched()) {
+            <mat-error>Debe tener al menos 3 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Descripción</mat-label>
+          <textarea matInput rows="3" placeholder="Describe brevemente la temática de la categoría" [formField]="categoriaForm.$form.descripcion"></textarea>
+          <mat-icon matPrefix>description</mat-icon>
+          @if (categoriaForm.$form.descripcion().errors().some(error => error.kind === 'required') && categoriaForm.$form.descripcion().touched()) {
+            <mat-error>La descripción es obligatoria</mat-error>
+          }
+          @if (categoriaForm.$form.descripcion().errors().some(error => error.kind === 'minLength') && categoriaForm.$form.descripcion().touched()) {
+            <mat-error>Debe tener al menos 3 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="status-toggle-box">
+          <mat-slide-toggle
+            [checked]="categoriaForm.value().estado === true"
+            (change)="onEstadoChange($event.checked)"
+            color="primary">
+            Estado: <strong>{{ categoriaForm.value().estado === true ? 'Activo' : 'Inactivo' }}</strong>
+          </mat-slide-toggle>
+        </div>
+
+        <div class="actions-row">
+          <button mat-button type="button" routerLink="/pages/categoria">
+            <mat-icon>close</mat-icon>
+            <span>Cancelar</span>
+          </button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="categoriaForm.isInvalid() || $isSaving()">
+            <mat-icon>check</mat-icon>
+            <span>{{ $isEdit() ? 'Actualizar' : 'Guardar' }}</span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

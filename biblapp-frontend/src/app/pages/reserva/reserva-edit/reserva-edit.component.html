@@ -1,0 +1,262 @@
+<div class="edit-container">
+  <mat-card class="edit-card">
+    <!-- Header -->
+    <div class="form-header">
+      <div class="header-info">
+        <div class="title-with-icon">
+          <mat-icon color="primary">{{ $isEdit() ? 'edit' : 'bookmark_add' }}</mat-icon>
+          <h2>{{ $isEdit() ? 'Editar Reserva #' + $id() : 'Nueva Reserva de Libros' }}</h2>
+        </div>
+        <p class="subtitle">Complete la información del cliente y los libros a reservar</p>
+      </div>
+
+      <button mat-stroked-button routerLink="/pages/reserva" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Volver a la lista</span>
+      </button>
+    </div>
+
+    @if ($isSaving()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <div class="form-content">
+      <!-- Section 1: Datos Generales de la Reserva -->
+      <div class="form-section">
+        <div class="section-header">
+          <mat-icon class="section-icon">event_note</mat-icon>
+          <h3>1. Datos de la Reserva</h3>
+        </div>
+
+        <div class="grid-2-col">
+          <!-- Fecha Reserva -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Fecha y Hora de Reserva</mat-label>
+            <input
+              matInput
+              type="datetime-local"
+              [value]="$model().fechaReserva"
+              (input)="onFechaChange($event)"
+              required
+            />
+            <mat-icon matPrefix>event</mat-icon>
+          </mat-form-field>
+
+          <!-- Observaciones -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Observaciones (opcional)</mat-label>
+            <textarea
+              matInput
+              rows="2"
+              [value]="$model().observacion || ''"
+              (input)="onObservacionChange($event)"
+              maxlength="500"
+              placeholder="Ej. Entrega prioritaria, turno matutino..."
+            ></textarea>
+            <mat-icon matPrefix>notes</mat-icon>
+            <mat-hint align="end">{{ ($model().observacion || '').length }}/500</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Section 2: Selección de Cliente -->
+      <div class="form-section">
+        <div class="section-header">
+          <mat-icon class="section-icon">person</mat-icon>
+          <h3>2. Selección de Cliente</h3>
+        </div>
+
+        <div class="cliente-selection-row">
+          <mat-form-field appearance="outline" class="cliente-select-field">
+            <mat-label>Seleccionar Cliente Activo</mat-label>
+            <mat-select
+              [value]="$selectedCliente().id"
+              (valueChange)="onClienteSelect($event)"
+              placeholder="Buscar cliente..."
+            >
+              @for (cliente of $clientesActivos(); track cliente.id) {
+                <mat-option [value]="cliente.id">
+                  {{ cliente.nombres }} {{ cliente.apellidos }} — C.I. {{ cliente.cedula }}
+                </mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>search</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <!-- Selected Cliente Preview Card -->
+        @if ($selectedCliente().id) {
+          <div class="cliente-preview-card">
+            <div class="cliente-preview-header">
+              <mat-icon class="card-icon" color="primary">account_circle</mat-icon>
+              <div>
+                <span class="preview-name">{{ $selectedCliente().nombres }} {{ $selectedCliente().apellidos }}</span>
+                <span class="preview-cedula">Cédula: {{ $selectedCliente().cedula }}</span>
+              </div>
+            </div>
+            <div class="cliente-details-grid">
+              <div class="detail-item">
+                <mat-icon class="mini-icon">email</mat-icon>
+                <span>{{ $selectedCliente().email || 'Sin correo' }}</span>
+              </div>
+              <div class="detail-item">
+                <mat-icon class="mini-icon">phone</mat-icon>
+                <span>{{ $selectedCliente().telefono || 'Sin teléfono' }}</span>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <div class="empty-cliente-alert">
+            <mat-icon>info</mat-icon>
+            <span>Por favor seleccione un cliente de la lista para asociar a la reserva.</span>
+          </div>
+        }
+      </div>
+
+      <!-- Section 3: Selección de Libros y Detalle -->
+      <div class="form-section">
+        <div class="section-header">
+          <mat-icon class="section-icon">library_books</mat-icon>
+          <h3>3. Libros a Reservar</h3>
+        </div>
+
+        <!-- Book Selection & Add Row -->
+        <div class="book-picker-row">
+          <mat-form-field appearance="outline" class="book-select-field">
+            <mat-label>Seleccionar Libro Disponible</mat-label>
+            <mat-select
+              [value]="selectedLibroId()"
+              (valueChange)="selectedLibroId.set($event)"
+              placeholder="Seleccione un libro..."
+            >
+              @for (libro of $librosDisponibles(); track libro.id) {
+                <mat-option [value]="libro.id">
+                  {{ libro.titulo }} — {{ libro.autor }} ({{ libro.categoria?.nombre || 'General' }})
+                </mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>menu_book</mat-icon>
+          </mat-form-field>
+
+          <button
+            mat-flat-button
+            color="primary"
+            class="add-book-btn"
+            [disabled]="!selectedLibroId()"
+            (click)="agregarLibro()"
+          >
+            <mat-icon>add_circle</mat-icon>
+            <span>Agregar al Detalle</span>
+          </button>
+        </div>
+
+        <!-- Detalle Table -->
+        @if ($detalles().length > 0) {
+          <div class="table-responsive detail-table-box">
+            <table mat-table [dataSource]="$detalles()" class="detail-table">
+              <!-- Portada -->
+              <ng-container matColumnDef="foto">
+                <th mat-header-cell *matHeaderCellDef class="th-cover">Portada</th>
+                <td mat-cell *matCellDef="let item" class="td-cover">
+                  <div class="book-cover-wrapper">
+                    <img
+                      [src]="getPhotoUrl(item.libro.photoUrl)"
+                      [alt]="item.libro.titulo"
+                      class="book-thumbnail"
+                      (error)="onImageError($event)"
+                    />
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Titulo -->
+              <ng-container matColumnDef="titulo">
+                <th mat-header-cell *matHeaderCellDef>Título</th>
+                <td mat-cell *matCellDef="let item">
+                  <div class="book-title-cell">
+                    <strong>{{ item.libro.titulo }}</strong>
+                    @if (item.libro.editorial) {
+                      <span class="editorial-sub">{{ item.libro.editorial }}</span>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Autor -->
+              <ng-container matColumnDef="autor">
+                <th mat-header-cell *matHeaderCellDef>Autor</th>
+                <td mat-cell *matCellDef="let item">{{ item.libro.autor }}</td>
+              </ng-container>
+
+              <!-- Categoria -->
+              <ng-container matColumnDef="categoria">
+                <th mat-header-cell *matHeaderCellDef>Categoría</th>
+                <td mat-cell *matCellDef="let item">
+                  <span class="category-badge">{{ item.libro.categoria?.nombre || 'General' }}</span>
+                </td>
+              </ng-container>
+
+              <!-- ISBN -->
+              <ng-container matColumnDef="isbn">
+                <th mat-header-cell *matHeaderCellDef>ISBN</th>
+                <td mat-cell *matCellDef="let item">
+                  <code>{{ item.libro.isbn }}</code>
+                </td>
+              </ng-container>
+
+              <!-- Acciones -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="th-remove">Acción</th>
+                <td mat-cell *matCellDef="let item" class="td-remove">
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="removerLibro(item.libro.id)"
+                    matTooltip="Quitar este libro"
+                  >
+                    <mat-icon>remove_circle_outline</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            </table>
+
+            <!-- Summary Footer -->
+            <div class="detail-summary-bar">
+              <span class="summary-label">Total de libros en la reserva:</span>
+              <span class="summary-count">{{ $detalles().length }} libro(s)</span>
+            </div>
+          </div>
+        } @else {
+          <div class="empty-books-alert">
+            <mat-icon color="warn">warning</mat-icon>
+            <div>
+              <strong>No se han añadido libros todavía</strong>
+              <p>Debe agregar al menos un libro para registrar la reserva.</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Actions / Submit -->
+    <div class="form-actions">
+      <button mat-stroked-button routerLink="/pages/reserva" [disabled]="$isSaving()">
+        Cancelar
+      </button>
+
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="guardar()"
+        [disabled]="reservaForm.isInvalid() || $isSaving()"
+        class="submit-button"
+      >
+        <mat-icon>{{ $isEdit() ? 'save' : 'check_circle' }}</mat-icon>
+        <span>{{ $isEdit() ? 'Actualizar Reserva' : 'Registrar Reserva' }}</span>
+      </button>
+    </div>
+  </mat-card>
+</div>

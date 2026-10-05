@@ -1,0 +1,201 @@
+<div class="edit-wrapper">
+  <mat-card class="edit-card">
+    <mat-card-header>
+      <div mat-card-avatar class="header-avatar">
+        <mat-icon>{{ $isEdit() ? 'edit' : 'add_circle' }}</mat-icon>
+      </div>
+      <mat-card-title>
+        {{ $isEdit() ? 'Editar Libro #' + $id() : 'Nuevo Libro' }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ $isEdit() ? 'Actualiza los datos del libro y su foto de portada' : 'Completa la información para registrar un nuevo libro con portada' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    @if ($isLoading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <mat-card-content>
+      <form [formRoot]="libroForm.$form" (submit)="operate()" class="form-container">
+        <div class="form-layout">
+          <!-- Left: Photo Upload & Preview Section -->
+          <div class="photo-section">
+            <label class="section-label">Foto de Portada</label>
+            <div class="photo-preview-card">
+              <div class="cover-wrapper">
+                <img
+                  [src]="currentPhotoUrl()"
+                  alt="Portada del libro"
+                  class="cover-image"
+                  (error)="onImageError($event)"
+                />
+              </div>
+
+              <div class="photo-upload-controls">
+                <input
+                  type="file"
+                  id="libro-photo-input"
+                  #fileInput
+                  accept="image/*"
+                  style="display: none"
+                  (change)="onFileSelected($event)"
+                />
+
+                <button
+                  mat-stroked-button
+                  color="primary"
+                  type="button"
+                  class="upload-btn"
+                  (click)="fileInput.click()">
+                  <mat-icon>photo_camera</mat-icon>
+                  <span>{{ $selectedFile() || libroForm.value().photoUrl ? 'Cambiar portada' : 'Subir portada' }}</span>
+                </button>
+
+                @if ($selectedFile()) {
+                  <div class="selected-file-info">
+                    <span class="file-name" [title]="$selectedFile()?.name">{{ $selectedFile()?.name }}</span>
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      type="button"
+                      matTooltip="Quitar nueva imagen"
+                      (click)="removeSelectedFile()">
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+                  </div>
+                }
+
+                @if ($fileError()) {
+                  <div class="photo-error-message">
+                    <mat-icon>error_outline</mat-icon>
+                    <span>{{ $fileError() }}</span>
+                  </div>
+                }
+
+                <p class="photo-hint">Imágenes de hasta 2MB (JPG, PNG, WebP)</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Book Metadata Form Fields -->
+          <div class="fields-section">
+            <!-- Hidden ID -->
+            <div [hidden]="true">
+              <mat-form-field appearance="outline">
+                <mat-label>ID</mat-label>
+                <input matInput placeholder="ID" [formField]="libroForm.$form.id" />
+              </mat-form-field>
+            </div>
+
+            <!-- Título -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Título del libro</mat-label>
+              <input matInput placeholder="Ej. Cien Años de Soledad" [formField]="libroForm.$form.titulo" />
+              <mat-icon matPrefix>book</mat-icon>
+              @if (libroForm.$form.titulo().errors().some(error => error.kind === 'required') && libroForm.$form.titulo().touched()) {
+                <mat-error>El título es obligatorio</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Autor & ISBN Row -->
+            <div class="form-row-2">
+              <mat-form-field appearance="outline">
+                <mat-label>Autor</mat-label>
+                <input matInput placeholder="Ej. Gabriel García Márquez" [formField]="libroForm.$form.autor" />
+                <mat-icon matPrefix>person</mat-icon>
+                @if (libroForm.$form.autor().errors().some(error => error.kind === 'required') && libroForm.$form.autor().touched()) {
+                  <mat-error>El autor es obligatorio</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>ISBN</mat-label>
+                <input matInput placeholder="Ej. 978-0307474728" [formField]="libroForm.$form.isbn" />
+                <mat-icon matPrefix>qr_code</mat-icon>
+                @if (libroForm.$form.isbn().errors().some(error => error.kind === 'required') && libroForm.$form.isbn().touched()) {
+                  <mat-error>El ISBN es obligatorio</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <!-- Categoría & Editorial Row -->
+            <div class="form-row-2">
+              <mat-form-field appearance="outline">
+                <mat-label>Categoría</mat-label>
+                <mat-select
+                  [value]="libroForm.value().categoria?.id"
+                  (valueChange)="onCategoriaSelect($event)">
+                  @for (cat of $categories(); track cat.id) {
+                    <mat-option [value]="cat.id">{{ cat.nombre }}</mat-option>
+                  }
+                </mat-select>
+                <mat-icon matPrefix>category</mat-icon>
+                @if (!libroForm.value().categoria?.id) {
+                  <mat-hint>Selecciona una categoría</mat-hint>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Editorial</mat-label>
+                <input matInput placeholder="Ej. Editorial Sudamericana" [formField]="libroForm.$form.editorial" />
+                <mat-icon matPrefix>business</mat-icon>
+              </mat-form-field>
+            </div>
+
+            <!-- Año & Cantidad Row -->
+            <div class="form-row-2">
+              <mat-form-field appearance="outline">
+                <mat-label>Año de Publicación</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  placeholder="Ej. 1967"
+                  [formField]="libroForm.$form.anioPublicacion"
+                />
+                <mat-icon matPrefix>calendar_today</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Cantidad de Ejemplares</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  placeholder="1"
+                  [formField]="libroForm.$form.cantidadEjemplares"
+                />
+                <mat-icon matPrefix>layers</mat-icon>
+              </mat-form-field>
+            </div>
+
+            <!-- Disponibilidad Toggle -->
+            <div class="status-toggle-box">
+              <mat-slide-toggle
+                [checked]="libroForm.value().disponible === true"
+                (change)="onDisponibleChange($event.checked)"
+                color="primary">
+                Disponibilidad: <strong>{{ libroForm.value().disponible === true ? 'Disponible' : 'Agotado' }}</strong>
+              </mat-slide-toggle>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="actions-row">
+          <button mat-button type="button" routerLink="/pages/libro">
+            <mat-icon>close</mat-icon>
+            <span>Cancelar</span>
+          </button>
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            [disabled]="libroForm.isInvalid() || $isSaving()">
+            <mat-icon>check</mat-icon>
+            <span>{{ $isEdit() ? 'Actualizar Libro' : 'Guardar Libro' }}</span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

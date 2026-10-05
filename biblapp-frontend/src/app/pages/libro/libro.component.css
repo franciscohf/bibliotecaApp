@@ -1,0 +1,210 @@
+.libro-container {
+  padding: 1.5rem;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.content-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.header-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.title-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.title-with-icon h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.subtitle {
+  margin: 0.25rem 0 0 0;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-field {
+  min-width: 260px;
+}
+
+.add-button {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.modern-table {
+  width: 100%;
+}
+
+.hover-row {
+  transition: background-color 0.2s ease;
+}
+
+.hover-row:hover {
+  background-color: #f8fafc;
+}
+
+.th-id, .td-id {
+  width: 60px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.th-photo, .td-photo {
+  width: 70px;
+  padding: 8px 12px !important;
+}
+
+.photo-thumbnail-wrapper {
+  width: 44px;
+  height: 60px;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f1f5f9;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.td-titulo {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.book-title-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.editorial-sub {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: normal;
+}
+
+.td-autor {
+  color: #334155;
+}
+
+.td-isbn code {
+  font-family: monospace;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #0369a1;
+}
+
+.td-categoria {
+  color: #475569;
+}
+
+.category-badge {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #bae6fd;
+}
+
+.th-cantidad, .td-cantidad {
+  width: 90px;
+  text-align: center;
+}
+
+.th-disponible, .td-disponible {
+  width: 120px;
+  text-align: center;
+}
+
+.chip-status {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  border-radius: 16px !important;
+  padding: 0 10px !important;
+  min-height: 24px !important;
+}
+
+.chip-active {
+  background-color: #e8f5e9 !important;
+  color: #2e7d32 !important;
+  border: 1px solid #c8e6c9 !important;
+}
+
+.chip-inactive {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+  border: 1px solid #fecaca !important;
+}
+
+.th-actions, .td-actions {
+  width: 110px;
+  text-align: center;
+}
+
+.no-data-cell {
+  padding: 2.5rem 1rem !important;
+  text-align: center;
+}
+
+.no-data-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #94a3b8;
+}
+
+.no-data-content mat-icon {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+}

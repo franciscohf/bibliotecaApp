@@ -1,0 +1,135 @@
+<div class="dialog-header">
+  <div class="dialog-title-group">
+    <mat-icon color="primary" class="header-icon">manage_search</mat-icon>
+    <div>
+      <h2 mat-dialog-title class="dialog-title">Detalle de Reserva #{{ reserva.id }}</h2>
+      <p class="dialog-subtitle">
+        Cliente: <strong>{{ reserva.cliente.nombres }} {{ reserva.cliente.apellidos }}</strong>
+        ({{ reserva.cliente.cedula }})
+      </p>
+    </div>
+  </div>
+  <button mat-icon-button mat-dialog-close aria-label="Cerrar">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="dialog-content">
+  <!-- Info Grid -->
+  <div class="info-grid">
+    <div class="info-item">
+      <span class="label">Fecha Reserva</span>
+      <span class="value">{{ reserva.fechaReserva | date: 'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+    <div class="info-item">
+      <span class="label">Fecha Creación</span>
+      <span class="value">{{ (reserva.fechaCreacion | date: 'dd/MM/yyyy HH:mm') || 'N/A' }}</span>
+    </div>
+    <div class="info-item">
+      <span class="label">Estado</span>
+      <mat-chip [class]="'chip-status chip-' + (reserva.estado || 'PENDIENTE').toLowerCase()">
+        {{ reserva.estado || 'PENDIENTE' }}
+      </mat-chip>
+    </div>
+    <div class="info-item">
+      <span class="label">Email Cliente</span>
+      <span class="value">{{ reserva.cliente.email || 'N/A' }}</span>
+    </div>
+    <div class="info-item">
+      <span class="label">Teléfono Cliente</span>
+      <span class="value">{{ reserva.cliente.telefono || 'N/A' }}</span>
+    </div>
+  </div>
+
+  <!-- Observaciones -->
+  <div class="obs-container">
+    @if (reserva.observacion) {
+      <div class="observacion-box">
+        <mat-icon class="obs-icon">notes</mat-icon>
+        <div>
+          <div class="obs-label">Observaciones</div>
+          <div class="obs-text">{{ reserva.observacion }}</div>
+        </div>
+      </div>
+    } @else {
+      <div class="observacion-box empty-obs">
+        <mat-icon class="obs-icon">info_outline</mat-icon>
+        <span class="obs-text">Sin observaciones registradas para esta reserva.</span>
+      </div>
+    }
+  </div>
+
+  <!-- Sección Libros -->
+  <div class="section-title">
+    <mat-icon>menu_book</mat-icon>
+    <span>Libros Reservados ({{ reserva.detallesReserva.length || 0 }})</span>
+  </div>
+
+  @if (reserva.detallesReserva && reserva.detallesReserva.length > 0) {
+    <div class="table-responsive">
+      <table mat-table [dataSource]="reserva.detallesReserva" class="books-table">
+        <!-- Portada -->
+        <ng-container matColumnDef="foto">
+          <th mat-header-cell *matHeaderCellDef>Portada</th>
+          <td mat-cell *matCellDef="let item">
+            <div class="book-cover-wrapper">
+              <img
+                [src]="getPhotoUrl(item.libro?.photoUrl)"
+                [alt]="item.libro?.titulo"
+                class="book-thumbnail"
+                (error)="onImageError($event)"
+              />
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Titulo -->
+        <ng-container matColumnDef="titulo">
+          <th mat-header-cell *matHeaderCellDef>Título</th>
+          <td mat-cell *matCellDef="let item">
+            <div class="book-title">{{ item.libro?.titulo }}</div>
+            @if (item.libro?.editorial) {
+              <div class="book-editorial">{{ item.libro?.editorial }}</div>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Autor -->
+        <ng-container matColumnDef="autor">
+          <th mat-header-cell *matHeaderCellDef>Autor</th>
+          <td mat-cell *matCellDef="let item">{{ item.libro?.autor }}</td>
+        </ng-container>
+
+        <!-- Categoria -->
+        <ng-container matColumnDef="categoria">
+          <th mat-header-cell *matHeaderCellDef>Categoría</th>
+          <td mat-cell *matCellDef="let item">
+            <span class="category-badge">{{ item.libro?.categoria?.nombre || 'General' }}</span>
+          </td>
+        </ng-container>
+
+        <!-- ISBN -->
+        <ng-container matColumnDef="isbn">
+          <th mat-header-cell *matHeaderCellDef>ISBN</th>
+          <td mat-cell *matCellDef="let item">
+            <code>{{ item.libro?.isbn }}</code>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+      </table>
+    </div>
+  } @else {
+    <div class="empty-books">
+      <mat-icon>auto_stories</mat-icon>
+      <p>No hay libros registrados en esta reserva.</p>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-flat-button color="primary" [mat-dialog-close]="true">
+    Cerrar
+  </button>
+</mat-dialog-actions>

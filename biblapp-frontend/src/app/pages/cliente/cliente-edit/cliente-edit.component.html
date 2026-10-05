@@ -1,0 +1,116 @@
+<div class="edit-wrapper">
+  <mat-card class="edit-card">
+    <mat-card-header>
+      <div mat-card-avatar class="header-avatar">
+        <mat-icon>{{ $isEdit() ? 'edit' : 'person_add' }}</mat-icon>
+      </div>
+      <mat-card-title>
+        {{ $isEdit() ? 'Editar Cliente #' + $id() : 'Nuevo Cliente' }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ $isEdit() ? 'Actualiza los datos del cliente' : 'Completa la información para registrar un nuevo cliente' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    @if ($isLoading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <mat-card-content>
+      <form [formRoot]="clienteForm.$form" (submit)="operate()" class="form-container">
+        <div [hidden]="true">
+          <mat-form-field appearance="outline">
+            <mat-label>ID</mat-label>
+            <input matInput placeholder="ID" [formField]="clienteForm.$form.id" />
+          </mat-form-field>
+        </div>
+
+        <!-- Nombres -->
+        <mat-form-field appearance="outline">
+          <mat-label>Nombres</mat-label>
+          <input matInput placeholder="Ej. Juan Carlos" [formField]="clienteForm.$form.nombres" />
+          <mat-icon matPrefix>badge</mat-icon>
+          @if (clienteForm.$form.nombres().errors().some(error => error.kind === 'required') && clienteForm.$form.nombres().touched()) {
+            <mat-error>Los nombres son obligatorios</mat-error>
+          }
+          @if (clienteForm.$form.nombres().errors().some(error => error.kind === 'minLength') && clienteForm.$form.nombres().touched()) {
+            <mat-error>Debe tener al menos 2 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Apellidos -->
+        <mat-form-field appearance="outline">
+          <mat-label>Apellidos</mat-label>
+          <input matInput placeholder="Ej. Pérez Gómez" [formField]="clienteForm.$form.apellidos" />
+          <mat-icon matPrefix>badge</mat-icon>
+          @if (clienteForm.$form.apellidos().errors().some(error => error.kind === 'required') && clienteForm.$form.apellidos().touched()) {
+            <mat-error>Los apellidos son obligatorios</mat-error>
+          }
+          @if (clienteForm.$form.apellidos().errors().some(error => error.kind === 'minLength') && clienteForm.$form.apellidos().touched()) {
+            <mat-error>Debe tener al menos 2 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Cedula -->
+        <mat-form-field appearance="outline">
+          <mat-label>Cédula / Documento</mat-label>
+          <input matInput placeholder="Ej. 1234567890" [formField]="clienteForm.$form.cedula" />
+          <mat-icon matPrefix>credit_card</mat-icon>
+          @if (clienteForm.$form.cedula().errors().some(error => error.kind === 'required') && clienteForm.$form.cedula().touched()) {
+            <mat-error>La cédula es obligatoria</mat-error>
+          }
+          @if (clienteForm.$form.cedula().errors().some(error => error.kind === 'minLength') && clienteForm.$form.cedula().touched()) {
+            <mat-error>Debe tener al menos 5 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Email -->
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" placeholder="Ej. juan.perez@example.com" [formField]="clienteForm.$form.email" />
+          <mat-icon matPrefix>email</mat-icon>
+          @if (clienteForm.$form.email().errors().some(error => error.kind === 'required') && clienteForm.$form.email().touched()) {
+            <mat-error>El correo electrónico es obligatorio</mat-error>
+          }
+          @if (clienteForm.$form.email().errors().some(error => error.kind === 'email') && clienteForm.$form.email().touched()) {
+            <mat-error>Formato de correo electrónico inválido</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Teléfono -->
+        <mat-form-field appearance="outline">
+          <mat-label>Teléfono</mat-label>
+          <input matInput placeholder="Ej. +593 999 123 456" [formField]="clienteForm.$form.telefono" />
+          <mat-icon matPrefix>phone</mat-icon>
+          @if (clienteForm.$form.telefono().errors().some(error => error.kind === 'required') && clienteForm.$form.telefono().touched()) {
+            <mat-error>El teléfono es obligatorio</mat-error>
+          }
+          @if (clienteForm.$form.telefono().errors().some(error => error.kind === 'minLength') && clienteForm.$form.telefono().touched()) {
+            <mat-error>Debe tener al menos 6 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Estado -->
+        <div class="status-toggle-box">
+          <mat-slide-toggle
+            [checked]="clienteForm.value().estado === true"
+            (change)="onEstadoChange($event.checked)"
+            color="primary">
+            Estado: <strong>{{ clienteForm.value().estado === true ? 'Activo' : 'Inactivo' }}</strong>
+          </mat-slide-toggle>
+        </div>
+
+        <div class="actions-row">
+          <button mat-button type="button" routerLink="/pages/cliente">
+            <mat-icon>close</mat-icon>
+            <span>Cancelar</span>
+          </button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="clienteForm.isInvalid() || $isSaving()">
+            <mat-icon>check</mat-icon>
+            <span>{{ $isEdit() ? 'Actualizar' : 'Guardar' }}</span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
